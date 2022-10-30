@@ -1,0 +1,76 @@
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'org.sonarqube'
+apply plugin: 'org.owasp.dependencycheck'
+
+artifactory {
+    contextUrl = artifactoryContextUrl
+    publish {
+        repository {
+            repoKey = version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+            username = artifactoryUser
+            password = artifactoryPassword
+            maven = true
+        }
+        defaults {
+            publications('pdpJwtSecretServer', 'pdpJwtSecretServerProperties')
+        }
+    }
+}
+
+publishing {
+    publications {
+        pdpJwtSecretServer(MavenPublication) {
+            from components.java
+        }
+        pdpJwtSecretServerProperties(MavenPublication) {
+            groupId group
+            artifactId "${project.name}-properties"
+            version version
+            artifact source: "${sourceSets.main.output.resourcesDir}/JwtSecretServer.properties"
+        }
+    }
+}
+
+dependencies {
+    implementation "com.nextlabs.common:config-client:${versions.cc}"
+    implementation "com.nextlabs.cc.base:agent-ipc-stub:${versions.cc}"
+    implementation "com.nextlabs.cc.base:client-pf:${versions.cc}"
+    implementation "com.nextlabs.cc.base:common-framework:${versions.cc}"
+    implementation "com.nextlabs.cc.base:common-pf:${versions.cc}"
+    implementation "com.nextlabs.cc.base:crypt:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-base:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-datasource:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-dcsf:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-framework:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-pdp-pluginmanager:${versions.cc}"
+    implementation "commons-logging:commons-logging:${versions.commonsLogging}"
+    implementation "hibernate:hibernate:${versions.hibernate}"
+    compileOnly project(':pdp-jwtsecrets-manager-common')
+}
+
+jar {
+    from(project(':pdp-jwtsecrets-manager-common').sourceSets.main.output) {
+        include '**/*.class'
+    }
+    manifest {
+        attributes('Provider-Class': 'com.nextlabs.plugins.jwtsecret.JwtSecretServer',
+                'Implementation-Vendor': 'NextLabs, Inc.',
+                'Implementation-Title': 'JWT Secret Manager',
+                'Implementation-Version': archiveVersion,
+                'Implementation-Time': new Date()
+        )
+    }
+    exclude 'PDPPluginManagerServer.properties'
+}
+
+dependencyCheck {
+    format = 'ALL'
+}
+
+sonarqube {
+    properties {
+        property 'sonar.dependencyCheck.reportPath', 'build/reports/dependency-check-report.xml'
+        property 'sonar.dependencyCheck.htmlReportPath', 'build/reports/dependency-check-report.html'
+        properties['sonar.sources'] += 'build.gradle'
+    }
+}

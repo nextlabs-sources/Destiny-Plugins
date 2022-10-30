@@ -1,0 +1,7 @@
+def versions = [:]
+
+versions.cc = '2021.09-SNAPSHOT'
+versions.commonsLogging = '1.2'
+versions.hibernate = '2.1.6'
+
+ext.versions = versions

@@ -1,0 +1,5 @@
+rootProject.name = 'cc-pdp-jwtsecrets-manager'
+
+include 'pdp-jwtsecrets-manager-common'
+include 'pdp-jwtsecrets-manager-client'
+include 'pdp-jwtsecrets-manager-server'

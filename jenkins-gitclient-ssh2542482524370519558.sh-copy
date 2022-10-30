@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ -z "${DISPLAY}" ]; then
+  DISPLAY=:123.456
+  export DISPLAY
+fi
+ssh -i "/var/lib/jenkins/workspace/bitbucketsync_Destiny-Plugins@tmp/jenkins-gitclient-ssh3874945783600423765.key" -l "git" -o StrictHostKeyChecking=no "$@"

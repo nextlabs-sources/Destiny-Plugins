@@ -1,0 +1,27 @@
+apply plugin: 'org.sonarqube'
+apply plugin: 'org.owasp.dependencycheck'
+
+dependencies {
+    implementation "com.nextlabs.cc.base:agent-ipc-stub:${versions.cc}"
+    implementation "com.nextlabs.cc.base:client-pf:${versions.cc}"
+    implementation "com.nextlabs.cc.base:common-framework:${versions.cc}"
+    implementation "com.nextlabs.cc.base:common-pf:${versions.cc}"
+    implementation "com.nextlabs.cc.base:crypt:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-base:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-datasource:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-dcsf:${versions.cc}"
+    implementation "com.nextlabs.cc.base:server-framework:${versions.cc}"
+    implementation "commons-logging:commons-logging:${versions.commonsLogging}"
+}
+
+dependencyCheck {
+    format = 'ALL'
+}
+
+sonarqube {
+    properties {
+        property 'sonar.dependencyCheck.reportPath', 'build/reports/dependency-check-report.xml'
+        property 'sonar.dependencyCheck.htmlReportPath', 'build/reports/dependency-check-report.html'
+        properties['sonar.sources'] += 'build.gradle'
+    }
+}
